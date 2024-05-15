@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        background-image: url('path/to/background-image.jpg'); /* Replace with the actual path to your background image */
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    .container {
+        max-width: 400px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    input[type="text"],
+    input[type="password"] {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    
+    button[type="submit"] {
+        padding: 10px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form id="register-form">
+            <input type="text" id="register-username" placeholder="Username" required>
+            <input type="password" id="register-password" placeholder="Password" required>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Handle register form submission
+            $('#register-form').submit(function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Get form data
+                var username = $('#register-username').val();
+                var password = $('#register-password').val();
+
+                // AJAX request to register
+                $.ajax({
+                    url: 'https://localhost:7131/register',
+                    type: 'POST',
+                    data: JSON.stringify({ username: username, password: password }),
+                    contentType: 'application/json',
+                    success: function(data) {
+                        alert('Registration successful! Token: ' + data.token);
+                    },
+                    error: function(xhr) {
+                        alert('Registration failed: ' + xhr.responseJSON.Error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

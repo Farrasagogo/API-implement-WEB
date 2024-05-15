@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Product</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Edit Product</h1>
+    <form id="edit-product-form">
+        <input type="hidden" name="id" id="product-id">
+        <input type="text" name="name" id="product-name" placeholder="Name" required>
+        <input type="number" name="price" id="product-price" placeholder="Price" required>
+        <input type="number" name="stock" id="product-stock" placeholder="Stock" required>
+        <button type="submit">Save</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Get the token from local storage
+            var token = localStorage.getItem('token');
+
+            // If token is not available, redirect to login page
+            if (!token) {
+                window.location.href = 'PAA_MANDIRI_PRODUCT.html';
+                return;
+            }
+
+            // Get the product ID from the URL query parameter
+            var urlParams = new URLSearchParams(window.location.search);
+            var productId = urlParams.get('id');
+
+            // Fetch the product details and populate the form
+            fetchProductDetails(productId);
+
+            // Handle form submission
+            $('#edit-product-form').submit(function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Get form data
+                var formData = {
+                    id: $('#product-id').val(),
+                    name: $('#product-name').val(),
+                    price: $('#product-price').val(),
+                    stock: $('#product-stock').val()
+                };
+
+                // AJAX request to update the product
+                $.ajax({
+                    url: 'https://localhost:7131/products/' + productId,
+                    type: 'PUT',
+                    data: JSON.stringify(formData), // Send data as JSON
+                    headers: {
+                        'Authorization': 'Bearer ' + token, // Include the token in the Authorization header
+                        'Content-Type': 'application/json' // Set the Content-Type header to application/json
+                    },
+                    success: function(data) {
+                        alert('Product updated: ' + data);
+                        window.location.href = 'PAA_MANDIRI_PRODUCT.html'; // Redirect to the product list page
+                    },
+                    error: function() {
+                        alert('Error updating product');
+                    }
+                });
+            });
+        });
+
+        function fetchProductDetails(productId) {
+            // Get the token from local storage
+            var token = localStorage.getItem('token');
+
+            // AJAX request to fetch product details
+            $.ajax({
+                url: 'https://localhost:7131/products/' + productId,
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token // Include the token in the Authorization header
+                },
+                success: function(data) {
+                    // Populate the form with the product data
+                    $('#product-id').val(data.id);
+                    $('#product-name').val(data.name);
+                    $('#product-price').val(data.price);
+                    $('#product-stock').val(data.stock);
+                },
+                error: function() {
+                    alert('Error fetching product details');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

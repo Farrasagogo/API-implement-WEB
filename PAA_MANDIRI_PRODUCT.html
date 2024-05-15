@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product List</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="product-list"></tbody>
+    </table>
+
+    <h2>Create Product</h2>
+    <form id="create-product-form">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="number" name="price" placeholder="Price" required>
+        <input type="number" name="stock" placeholder="Stock" required>
+        <button type="submit">Create</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Get the token from local storage
+            var token = localStorage.getItem('token');
+
+            // If token is not available, redirect to login page
+            if (!token) {
+                window.location.href = 'PAA_MANDIRI_PRODUCT.html';
+                return;
+            }
+
+            // Fetch product list
+            fetchProductList();
+
+            // Handle form submission
+                    $('#create-product-form').submit(function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form data
+            var formData = {
+                name: $('input[name="name"]').val(),
+                price: $('input[name="price"]').val(),
+                stock: $('input[name="stock"]').val()
+            };
+
+            // AJAX request to create a new product
+            $.ajax({
+                url: 'https://localhost:7131/products',
+                type: 'POST',
+                data: JSON.stringify(formData), // Send data as JSON
+                headers: {
+                    'Authorization': 'Bearer ' + token, // Include the token in the Authorization header
+                    'Content-Type': 'application/json' // Set the Content-Type header to application/json
+                },
+                success: function(data) {
+                    alert('Product created: ' + data);
+                    fetchProductList(); // Refresh the product list
+                },
+                error: function() {
+                    alert('Error creating product');
+                }
+            });
+        });
+        });
+        function fetchProductList() {
+            // Get the token from local storage
+            var token = localStorage.getItem('token');
+
+            // AJAX request to fetch product list
+            $.ajax({
+                url: 'https://localhost:7131/products',
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token // Include the token in the Authorization header
+                },
+                success: function(data) {
+                    // Clear the table body
+                    $('#product-list').empty();
+
+                    // Populate the table with the product data
+                    $.each(data, function(index, product) {
+                $('#product-list').append('<tr><td>' + product.id + '</td><td>' + product.name + '</td><td>' + product.price + '</td><td>' + product.stock + '</td><td><button class="edit-btn" data-id="' + product.id + '">Edit</button> <button class="delete-btn" data-id="' + product.id + '">Delete</button></td></tr>');
+                    });
+
+                    // Attach click event handler for edit buttons
+                    $('.edit-btn').click(function() {
+                        var productId = $(this).data('id');
+                        window.location.href = 'PAA_MANDIRI_PRODUCT_UPDATE.html?id=' + productId; // Navigate to the edit product page with the product ID as a query parameter
+                    });
+
+                    // Attach click event handler for delete buttons
+                    $('.delete-btn').click(function() {
+                        var productId = $(this).data('id');
+                        deleteProduct(productId);
+                    });
+                }
+,
+                error: function() {
+                    alert('Error fetching product list');
+                }
+            });
+        }
+
+  function deleteProduct(productId) {
+            // Get the token from local storage
+            var token = localStorage.getItem('token');
+
+            // AJAX request to delete a product
+            $.ajax({
+                url: 'https://localhost:7131/products/' + productId,
+                type: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token // Include the token in the Authorization header
+                },
+                success: function(data) {
+                    alert('Product deleted: ' + data);
+                    fetchProductList(); // Refresh the product list
+                },
+                error: function() {
+                    alert('Error deleting product');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
